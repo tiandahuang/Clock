@@ -6,7 +6,7 @@
  * 
  * With 4 pins per motor and 4 motors, pins D2-D13, A0-A3 will be used
  * 
- * Power: ~300mA @ 5V
+ * Per motor power: ~300mA @ 5V
  * Effective max steps/second: 1000
  * 4096 steps/revolution (half-steps)
  */
@@ -29,7 +29,7 @@
  * Numbers are from left to right
  */
 
-AccelStepper stepper1(AccelStepper::HALF4WIRE, 2, 4, 3, 5); // todo: fix
+AccelStepper stepper1(AccelStepper::HALF4WIRE, 2, 4, 3, 5);
 AccelStepper stepper2(AccelStepper::HALF4WIRE, 6, 8, 7, 9);
 AccelStepper stepper3(AccelStepper::HALF4WIRE, A0, A2, A1, A3);
 AccelStepper stepper4(AccelStepper::HALF4WIRE, 10, 12, 11, 13);
@@ -44,6 +44,12 @@ void stepper_init() {
     }
 }
 
+/** Update All Positions
+ * @brief Step once on all motors according to the speed set. 
+ * @note Call really fast repeatedly until 'false' is returned to run all motors to their positions.
+ * 
+ * @return true if any motor is still running to its position, false if all motors are done moving
+ */
 bool update_all_positions() {
     bool running = false;
     for (uint8_t i = 0; i < NUM_MOTORS; i++) {
@@ -58,6 +64,9 @@ bool update_all_positions() {
     return running;
 }
 
+/** Update All Positions (Blocking)
+ * @brief Run all motors until their positions are reached
+ */
 void update_all_positions_blocking() {
     for (uint8_t i = 0; i < NUM_MOTORS; i++) {
         stepper_list[i]->enableOutputs();
@@ -76,12 +85,18 @@ void update_all_positions_blocking() {
  */
 SplitFlapUnit::SplitFlapUnit(uint8_t num) : num{num}, current_pos{10}, next_pos{10} {};
 
-
+/** Get Position
+ * @return uint8_t current position (0 - 10)
+ */
 uint8_t SplitFlapUnit::getPos() {
     return current_pos;
 }
 
-
+/** Set Position
+ * @brief Set next position and the index to lookup steps with
+ * 
+ * @param pos Next position (0 - 10)
+ */
 void SplitFlapUnit::setPos(uint8_t pos) {
     next_pos = pos;
 
@@ -94,22 +109,32 @@ void SplitFlapUnit::setPos(uint8_t pos) {
     }
 }
 
-
+/** Set Steps
+ * @brief Evaluate and set the steps to reach the target position
+ * 
+ * @return true if steps correctly set, false if called when motor is in motion
+ */
 bool SplitFlapUnit::setSteps() {
     if ((stepper_list[num]->distanceToGo() != 0) || (stepper_list[num]->speed() != 0.0)) {
         // steps for next move cannot be set while motor is running
+        dbprint("ERROR: Steps set while in-motion: Unit #", num, "\n");
         return false;
     }
 
     int32_t steps_to_go = steps_lookup[next_lookup_idx] - steps_lookup[current_lookup_idx];
     if (steps_to_go < 0) steps_to_go += STEPS_PER_REVOLUTION;
     if ((num % 2) == 1) steps_to_go *= -1;
-    dbprint("Steps for next move:", steps_to_go, "\n");
+    dbprint("Steps for next move: Unit #", num, " Steps ", steps_to_go, "\n");
 
     this->trimSteps(steps_to_go);
 }
 
-
+/** Trim Steps
+ * @brief Set steps to move by the amount specified
+ * @note Does not actually move motor
+ * 
+ * @param trim Steps to move
+ */
 void SplitFlapUnit::trimSteps(int32_t trim) {
     stepper_list[num]->setCurrentPosition(0);
     stepper_list[num]->moveTo(trim);

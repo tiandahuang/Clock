@@ -17,17 +17,5 @@ void setup() {
 }
 
 void loop() {
-    delay(3000);
-    SFU_hour_tens.trimSteps(4096);
-    SFU_hour_ones.trimSteps(4096);
-    SFU_min_tens.trimSteps(4096);
-    SFU_min_ones.trimSteps(4096);
-    update_all_positions_blocking();
-
-    delay(3000);
-    SFU_hour_tens.trimSteps(-4096);
-    SFU_hour_ones.trimSteps(-4096);
-    SFU_min_tens.trimSteps(-4096);
-    SFU_min_ones.trimSteps(-4096);
-    update_all_positions_blocking();
+    
 }

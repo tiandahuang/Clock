@@ -2,12 +2,12 @@
  * @file serial-input.cpp
  */
 
-#include "../inc/serial-input.h"
 #include <Arduino.h>
-#include <string.h>
+#include "../inc/serial-input.h"
+#include "../debug.h"
 
 #define SERIAL_TIMEOUT 2000
-#define SERIAL_MAX_LENGTH 30
+#define SERIAL_MAX_LENGTH 32
 char input_buffer[SERIAL_MAX_LENGTH + 1] = {'\0'};   // last char reserved for null terminator
 
 /** Serial inialization
@@ -19,7 +19,7 @@ void serial_init() {
 /** Read Byte Safe
  * @brief Read a byte from Serial with timeout
  * 
- * @return >=0 if valid read, -1 if timeout
+ * @return Value of byte read if valid read, -1 if timeout
  */
 char read_byte_safe() {
     char byte_in;
@@ -37,9 +37,14 @@ char read_byte_safe() {
  * @param char* term: Null-terminated string containing terminators
  * @param char* buf: Input buffer
  * @param uint8_t length: Size of input buffer
- * @return Length of the message read, -1 if Serial times out
+ * @return Length of the message read, -1 if error
  */
 int serial_read_safe(const char *term, char *buf, uint8_t length) {
+    if (Serial.available() == 0) {
+        return -1;
+        dbprint("ERROR: Empty serial read\n");
+    }
+
     // find number of terminators to speed up byte reading
     uint8_t num_terminators = strlen(term);
     uint8_t i;
@@ -48,6 +53,7 @@ int serial_read_safe(const char *term, char *buf, uint8_t length) {
         char byte_in = read_byte_safe();
         if (byte_in == -1) {    // timeout
             i = -1;
+            dbprint("ERROR: Serial timeout\n");
             break;
         }
         // check terminator
