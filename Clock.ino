@@ -19,3 +19,5 @@ void setup() {
 void loop() {
     
 }
+
+// TODO: The time part of the clock

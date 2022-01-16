@@ -74,3 +74,6 @@ int serial_read_safe(const char *term, char *buf, uint8_t length) {
 
     return i;
 }
+
+// TODO: Input parsing - return int array of params?
+// TODO: param array returned to main() to do stuff in debug loop
