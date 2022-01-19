@@ -44,6 +44,23 @@ void stepper_init() {
     }
 }
 
+/** Check Pending Move
+ * @brief Check if any motors need to be moved
+ * @note Use to avoid calling update_all_positions_blocking() too often, since that turns on the motors
+ * 
+ * @return true if any motor needs to be moved
+ */
+bool check_pending_move() {
+    bool pending = false;
+    for (uint8_t i = 0; i < NUM_MOTORS; i++) {
+        if (stepper_list[i]->distanceToGo() != 0) {
+            pending = true;
+            break;
+        }
+    }
+    return pending;
+}
+
 /** Update All Positions
  * @brief Step once on all motors according to the speed set. 
  * @note Call really fast repeatedly until 'false' is returned to run all motors to their positions.

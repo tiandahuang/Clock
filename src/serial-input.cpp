@@ -6,9 +6,12 @@
 #include "../inc/serial-input.h"
 #include "../debug.h"
 
-#define SERIAL_TIMEOUT 2000
+#define SERIAL_TIMEOUT 1000
 #define SERIAL_MAX_LENGTH 32
-char input_buffer[SERIAL_MAX_LENGTH + 1] = {'\0'};   // last char reserved for null terminator
+static char input_buffer[SERIAL_MAX_LENGTH + 1] = {'\0'};   // last char reserved for null terminator
+
+#define MAX_PARAMS 4
+static int32_t params[MAX_PARAMS] = {0};
 
 /** Serial inialization
  */
@@ -39,10 +42,10 @@ char read_byte_safe() {
  * @param uint8_t length: Size of input buffer
  * @return Length of the message read, -1 if error
  */
-int serial_read_safe(const char *term, char *buf, uint8_t length) {
+int32_t serial_read_safe(const char *term, char *buf, uint8_t length) {
     if (Serial.available() == 0) {
-        return -1;
         dbprint("ERROR: Empty serial read\n");
+        return -1;
     }
 
     // find number of terminators to speed up byte reading
@@ -73,6 +76,62 @@ int serial_read_safe(const char *term, char *buf, uint8_t length) {
     }
 
     return i;
+}
+
+const char cmd_0[] PROGMEM = "move";
+const char cmd_1[] PROGMEM = "stop";
+const char cmd_2[] PROGMEM = "time";
+const char* const cmd_table[] PROGMEM = {cmd_0, cmd_1, cmd_2};
+
+/** Serial Parse and Read
+ * @brief Read serial message and parse the command and parameters
+ * @note Ideally call only when serial is available, nullptr will be returned if unavailable
+ * 
+ * @return int32_t* pointer to array of parsed parameters, nullptr if invalid
+ */
+int32_t* serial_parse_read() {
+    if (Serial.available() == 0) {
+        return nullptr;
+    }
+
+    int32_t message_len = serial_read_safe("\n\r", input_buffer, SERIAL_MAX_LENGTH);
+    for (uint8_t i = 0; (i < SERIAL_MAX_LENGTH) && (input_buffer[i] != '\0'); i++) {
+        input_buffer[i] = tolower(input_buffer[i]);
+    }
+    Serial.println(input_buffer);
+
+    char* split = strtok(input_buffer, " ,");
+    if (split == nullptr) {
+        return nullptr;
+    }
+    uint8_t command_num;
+    for (command_num = 0; command_num < NUM_COMMANDS; command_num++) {
+        #ifndef __INTELLISENSE__
+        if (strcmp_P(split, (char*)pgm_read_word(&(cmd_table[command_num]))) == 0) {
+            break;
+        }
+        #endif
+    }
+    if (command_num == NUM_COMMANDS) {
+        Serial.println("Invalid command.");
+        return nullptr;
+    }
+    else {
+        params[0] = command_num;
+        dbprint("Parsed command: [", params[0], "] ");
+    }
+
+    for (uint8_t i = 1; i < MAX_PARAMS; i++) {
+        split = strtok(nullptr, " ,");
+        if (split == nullptr) {
+            break;
+        }
+        params[i] = atoi(split);
+        dbprint("[", params[i], "] ");
+    }
+    dbprint("\n");
+
+    return params;
 }
 
 // TODO: Input parsing - return int array of params?

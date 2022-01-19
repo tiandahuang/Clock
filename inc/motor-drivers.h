@@ -17,6 +17,13 @@
 
 void stepper_init();
 
+/** Check Pending Move
+ * @brief Check if any motors need to be moved
+ * 
+ * @return true if any motor needs to be moved
+ */
+bool check_pending_move();
+
 /** Update All Positions
  * @brief Step once on all motors according to the speed set. 
  * @note Call really fast repeatedly until 'false' is returned to run all motors to their positions.
