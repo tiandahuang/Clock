@@ -20,6 +20,8 @@ Time::Time(uint8_t hours_, uint8_t minutes_, uint8_t seconds_) :
 bool Time::updateTime(uint8_t hours_, uint8_t minutes_, uint8_t seconds_) {
     bool invalid = ((hours_ >= 24) || (minutes_ >= 60) || (seconds_ >= 60));
     if (invalid) {
+        dbprint("ERROR: Invalid time for updating: ", 
+            hours_, " ", minutes_, " ", seconds_, "\n");
         return false;
     }
     this->hours_ = hours_;
