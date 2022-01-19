@@ -100,13 +100,13 @@ void update_all_positions_blocking() {
  * Each unit is initialized to the 'blank' position.
  * Run calibration to move each unit to the exact position.
  */
-SplitFlapUnit::SplitFlapUnit(uint8_t num) : num{num}, current_pos{10}, next_pos{10} {};
+SplitFlapUnit::SplitFlapUnit(uint8_t num_) : num_{num_}, current_pos_{10}, next_pos_{10} {};
 
 /** Get Position
  * @return uint8_t current position (0 - 10)
  */
 uint8_t SplitFlapUnit::getPos() {
-    return current_pos;
+    return current_pos_;
 }
 
 /** Set Position
@@ -115,14 +115,14 @@ uint8_t SplitFlapUnit::getPos() {
  * @param pos Next position (0 - 10)
  */
 void SplitFlapUnit::setPos(uint8_t pos) {
-    next_pos = pos;
+    next_pos_ = pos;
 
     if (pos == 10) {
-        next_lookup_idx = 10;
+        next_lookup_idx_ = 10;
     }
     else {
         // for the hour 'hands,' the flap order is flipped
-        next_lookup_idx = (num <= HOUR_ONES) ? (9 - pos) : pos;
+        next_lookup_idx_ = (num_ <= HOUR_ONES) ? (9 - pos) : pos;
     }
 }
 
@@ -132,16 +132,16 @@ void SplitFlapUnit::setPos(uint8_t pos) {
  * @return true if steps correctly set, false if called when motor is in motion
  */
 bool SplitFlapUnit::setSteps() {
-    if ((stepper_list[num]->distanceToGo() != 0) || (stepper_list[num]->speed() != 0.0)) {
+    if ((stepper_list[num_]->distanceToGo() != 0) || (stepper_list[num_]->speed() != 0.0)) {
         // steps for next move cannot be set while motor is running
-        dbprint("ERROR: Steps set while in-motion: Unit #", num, "\n");
+        dbprint("ERROR: Steps set while in-motion: Unit #", num_, "\n");
         return false;
     }
 
-    int32_t steps_to_go = steps_lookup[next_lookup_idx] - steps_lookup[current_lookup_idx];
+    int32_t steps_to_go = steps_lookup[next_lookup_idx_] - steps_lookup[current_lookup_idx_];
     if (steps_to_go < 0) steps_to_go += STEPS_PER_REVOLUTION;
-    if ((num % 2) == 1) steps_to_go *= -1;
-    dbprint("Steps for next move: Unit #", num, " Steps ", steps_to_go, "\n");
+    if ((num_ % 2) == 1) steps_to_go *= -1;
+    dbprint("Steps for next move: Unit #", num_, " Steps ", steps_to_go, "\n");
 
     this->trimSteps(steps_to_go);
 }
@@ -153,7 +153,7 @@ bool SplitFlapUnit::setSteps() {
  * @param trim Steps to move
  */
 void SplitFlapUnit::trimSteps(int32_t trim) {
-    stepper_list[num]->setCurrentPosition(0);
-    stepper_list[num]->moveTo(trim);
-    stepper_list[num]->setSpeed((trim < 0) ? (-MOVE_SPEED) : MOVE_SPEED);
+    stepper_list[num_]->setCurrentPosition(0);
+    stepper_list[num_]->moveTo(trim);
+    stepper_list[num_]->setSpeed((trim < 0) ? (-MOVE_SPEED) : MOVE_SPEED);
 }

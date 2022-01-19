@@ -51,7 +51,7 @@ public:
      * Each unit is initialized to the 'blank' position.
      * Run calibration to move each unit to the exact position.
      */
-    SplitFlapUnit(uint8_t num);
+    SplitFlapUnit(uint8_t num_);
 
     /** Get Position
      * @return uint8_t current position (0 - 10)
@@ -84,17 +84,17 @@ private:
     /**
      * unit 0 - 3 (HOUR_TENS, HOUR_ONES, MIN_TENS, MIN_ONES)
      */
-    uint8_t num;
+    uint8_t num_;
 
     /**
      * flap positions 0 - 10
      * 0 - 9 correspond to digits 0 - 9
      * flap position 10 is blank
      */
-    uint8_t current_pos, next_pos;
+    uint8_t current_pos_, next_pos_;
 
     /**
      * index to find steps in the lookup table
      */
-    uint8_t current_lookup_idx, next_lookup_idx;
+    uint8_t current_lookup_idx_, next_lookup_idx_;
 };
