@@ -17,7 +17,6 @@
 #include <AccelStepper.h>
 #include "../debug.h"
 
-#define NUM_MOTORS 4
 #define MAX_SPEED 1000
 #define STEPS_PER_REVOLUTION 4096
 
@@ -111,6 +110,7 @@ uint8_t SplitFlapUnit::getPos() {
 
 /** Set Position
  * @brief Set next position and the index to lookup steps with
+ * @note Does not queue move on motors, call setSteps() to do that
  * 
  * @param pos Next position (0 - 10)
  */

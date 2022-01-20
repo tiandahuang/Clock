@@ -13,10 +13,10 @@ public:
     const uint8_t& second = seconds_;
     
     /**
-     * Semaphore set when the time is changed during an update
+     * Semaphore set when the minute is changed during an update
      * Clear this to acknowledge the time update
      */
-    bool sem_time_changed;
+    bool sem_minute_changed;
 
     Time();
     /**

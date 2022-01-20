@@ -8,11 +8,11 @@
 
 Time::Time() : 
     hours_{0}, minutes_{0}, seconds_{0}, milliseconds_{0}, 
-    sem_time_changed{false} {};
+    sem_minute_changed{false} {};
 
 Time::Time(uint8_t hours_, uint8_t minutes_, uint8_t seconds_) :
     hours_{hours_}, minutes_{minutes_}, seconds_{seconds_}, milliseconds_{0}, 
-    sem_time_changed{false} {};
+    sem_minute_changed{false} {};
 
 /**
  * @brief Change time to new desired time
@@ -32,7 +32,7 @@ bool Time::updateTime(uint8_t hours_, uint8_t minutes_, uint8_t seconds_) {
     this->seconds_ = seconds_;
     previous_millis_ = millis();
     milliseconds_ = 0;
-    sem_time_changed = true;
+    sem_minute_changed = true;
 
     return true;
 }
@@ -48,13 +48,13 @@ void Time::updateTime() {
         return;
     }
     else if ((milliseconds_ >= 1000) && (milliseconds_ < 2000)) {
-        sem_time_changed = true;
         // Single-increment if time is at most +1 sec
         milliseconds_ -= 1000;
         seconds_++;
         if (seconds_ == 60) {
             seconds_ = 0;
             minutes_++;
+            sem_minute_changed = true;
         }
         if (minutes_ == 60) {
             minutes_ = 0;
@@ -65,14 +65,16 @@ void Time::updateTime() {
         }
     }
     else {
-        sem_time_changed = true;
+        sem_minute_changed = true;
         // Multi-increment time if a long time has passed
         seconds_ += milliseconds_ / 1000;
         milliseconds_ %= 1000;
 
-        minutes_ += seconds_ / 60;
-        seconds_ %= 60;
-
+        if (seconds_ >= 60) {
+            minutes_ += seconds_ / 60;
+            seconds_ %= 60;
+            sem_minute_changed = true;
+        }
         // Minutes ticks over by max 2
         if (minutes_ >= 60) {
             minutes_ -= 60;

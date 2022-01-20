@@ -13,7 +13,7 @@
 
 #pragma once
 
-
+#define NUM_MOTORS 4
 
 void stepper_init();
 
@@ -60,6 +60,7 @@ public:
 
     /** Set Position
      * @brief Set next position and the index to lookup steps with
+     * @note Does not queue move on motors, call setSteps() to do that
      * 
      * @param pos Next position (0 - 10)
      */

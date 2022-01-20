@@ -22,8 +22,10 @@ void setup() {
 }
 
 void loop() {
+    // Update time()
     The_time.updateTime();
 
+    // Parse command (if there is one)
     if (Serial.available() > 0) {
         int32_t *input = serial_parse_read();
         if (input != nullptr) {
@@ -42,7 +44,21 @@ void loop() {
             }
         }
     }
+
+    // Set positions for new times
+    if (The_time.sem_minute_changed) {
+        SFU_hour_tens.setPos(The_time.hour / 10);
+        SFU_hour_ones.setPos(The_time.hour % 10);
+        SFU_min_tens.setPos(The_time.minute / 10);
+        SFU_min_ones.setPos(The_time.minute % 10);
+        SFU_hour_tens.setSteps();
+        SFU_hour_ones.setSteps();
+        SFU_min_tens.setSteps();
+        SFU_min_ones.setSteps();
+        The_time.sem_minute_changed = false;
+    }
     
+    // Move motors (blocks until done)
     if (check_pending_move()) {
         update_all_positions_blocking();
     }
