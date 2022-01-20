@@ -26,9 +26,9 @@ public:
     
     /**
      * @brief Change time to new desired time
-     * @note Will not mess up the time if big numbers are inputted
+     * @note Will not mess up the time if big numbers are inputted if validate is true
      */
-    bool updateTime(uint8_t hours_, uint8_t minutes_, uint8_t seconds_);
+    bool updateTime(uint8_t hours_, uint8_t minutes_, uint8_t seconds_, bool validate);
 
     /**
      * @brief Update stored time

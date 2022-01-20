@@ -23,7 +23,7 @@ void setup() {
 
 void loop() {
     // Update time()
-    The_time.updateTime();
+    //The_time.updateTime();
 
     // Parse command (if there is one)
     if (Serial.available() > 0) {
@@ -39,7 +39,10 @@ void loop() {
                 case STOP : // TODO: implement this to break move commands
                     break;
                 case TIME :
-                    The_time.updateTime(input[1], input[2], input[3]);
+                    The_time.updateTime(input[1], input[2], input[3], true);
+                    break;
+                case SETF :
+                    The_time.updateTime(input[1], input[2], 0, false);
                     break;
             }
         }

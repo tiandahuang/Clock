@@ -81,7 +81,8 @@ int32_t serial_read_safe(const char *term, char *buf, uint8_t length) {
 const char cmd_0[] PROGMEM = "move";
 const char cmd_1[] PROGMEM = "stop";
 const char cmd_2[] PROGMEM = "time";
-const char* const cmd_table[] PROGMEM = {cmd_0, cmd_1, cmd_2};
+const char cmd_3[] PROGMEM = "setf";
+const char* const cmd_table[] PROGMEM = {cmd_0, cmd_1, cmd_2, cmd_3};
 
 /** Serial Parse and Read
  * @brief Read serial message and parse the command and parameters

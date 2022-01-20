@@ -9,6 +9,7 @@ enum InputCommand : uint8_t {
     MOVE = 0,
     STOP,
     TIME,
+    SETF,
     NUM_COMMANDS
 };
 
