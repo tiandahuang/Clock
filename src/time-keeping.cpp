@@ -65,6 +65,12 @@ void Time::updateTime() {
         }
     }
     else {
+        /**
+         * This stuff is necessary in the case that a long blocking
+         * motor function is called. I'll try to avoid that, but there
+         * may be somewhere that it's unavoidable.
+         */
+
         sem_minute_changed = true;
         // Multi-increment time if a long time has passed
         seconds_ += milliseconds_ / 1000;
@@ -86,3 +92,4 @@ void Time::updateTime() {
     }
 }
 
+// TODO: stopwatch and timer support

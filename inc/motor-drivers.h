@@ -16,6 +16,8 @@
 #define NUM_MOTORS 4
 
 void stepper_init();
+void stepper_enable();
+void stepper_disable();
 
 /** Check Pending Move
  * @brief Check if any motors need to be moved

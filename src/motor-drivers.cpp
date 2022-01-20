@@ -43,6 +43,18 @@ void stepper_init() {
     }
 }
 
+void stepper_enable() {
+    for (uint8_t i = 0; i < NUM_MOTORS; i++) {
+        stepper_list[i]->enableOutputs();
+    }
+}
+
+void stepper_disable() {
+    for (uint8_t i = 0; i < NUM_MOTORS; i++) {
+        stepper_list[i]->disableOutputs();
+    }
+}
+
 /** Check Pending Move
  * @brief Check if any motors need to be moved
  * @note Use to avoid calling update_all_positions_blocking() too often, since that turns on the motors
@@ -84,15 +96,9 @@ bool update_all_positions() {
  * @brief Run all motors until their positions are reached
  */
 void update_all_positions_blocking() {
-    for (uint8_t i = 0; i < NUM_MOTORS; i++) {
-        stepper_list[i]->enableOutputs();
-    }
-
+    stepper_enable();
     while (update_all_positions());
-
-    for (uint8_t i = 0; i < NUM_MOTORS; i++) {
-        stepper_list[i]->disableOutputs();
-    }
+    stepper_disable();
 }
 
 /**
