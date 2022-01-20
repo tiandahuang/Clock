@@ -6,10 +6,13 @@
 #include "../inc/time-keeping.h"
 #include "../debug.h"
 
-Time::Time() : hours_{0}, minutes_{0}, seconds_{0}, milliseconds_{0} {};
+Time::Time() : 
+    hours_{0}, minutes_{0}, seconds_{0}, milliseconds_{0}, 
+    sem_time_changed{false} {};
 
 Time::Time(uint8_t hours_, uint8_t minutes_, uint8_t seconds_) :
-    hours_{hours_}, minutes_{minutes_}, seconds_{seconds_}, milliseconds_{0} {};
+    hours_{hours_}, minutes_{minutes_}, seconds_{seconds_}, milliseconds_{0}, 
+    sem_time_changed{false} {};
 
 /**
  * @brief Change time to new desired time
@@ -29,6 +32,7 @@ bool Time::updateTime(uint8_t hours_, uint8_t minutes_, uint8_t seconds_) {
     this->seconds_ = seconds_;
     previous_millis_ = millis();
     milliseconds_ = 0;
+    sem_time_changed = true;
 
     return true;
 }
@@ -44,6 +48,7 @@ void Time::updateTime() {
         return;
     }
     else if ((milliseconds_ >= 1000) && (milliseconds_ < 2000)) {
+        sem_time_changed = true;
         // Single-increment if time is at most +1 sec
         milliseconds_ -= 1000;
         seconds_++;
@@ -60,6 +65,7 @@ void Time::updateTime() {
         }
     }
     else {
+        sem_time_changed = true;
         // Multi-increment time if a long time has passed
         seconds_ += milliseconds_ / 1000;
         milliseconds_ %= 1000;

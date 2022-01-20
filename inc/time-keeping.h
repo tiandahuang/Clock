@@ -11,6 +11,12 @@ public:
     const uint8_t& hour = hours_;
     const uint8_t& minute = minutes_;
     const uint8_t& second = seconds_;
+    
+    /**
+     * Semaphore set when the time is changed during an update
+     * Clear this to acknowledge the time update
+     */
+    bool sem_time_changed;
 
     Time();
     /**

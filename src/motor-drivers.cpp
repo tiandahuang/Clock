@@ -140,7 +140,7 @@ bool SplitFlapUnit::setSteps() {
 
     int32_t steps_to_go = steps_lookup[next_lookup_idx_] - steps_lookup[current_lookup_idx_];
     if (steps_to_go < 0) steps_to_go += STEPS_PER_REVOLUTION;
-    if ((num_ % 2) == 1) steps_to_go *= -1;
+    if ((num_ % 2) == 0) steps_to_go *= -1;
     dbprint("Steps for next move: Unit #", num_, " Steps ", steps_to_go, "\n");
 
     this->trimSteps(steps_to_go);
