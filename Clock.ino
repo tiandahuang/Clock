@@ -66,3 +66,6 @@ void loop() {
         update_all_positions_blocking();
     }
 }
+
+// TODO: tune motor speed
+// TODO: physical stuff misbehaving

@@ -4,5 +4,5 @@
     "programmer": "arduino:avrispmkii",
     "sketch": "Clock.ino",
     "output": "build",
-    "port": "COM4"
+    "port": "COM12"
 }

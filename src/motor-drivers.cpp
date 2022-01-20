@@ -20,7 +20,7 @@
 #define MAX_SPEED 1000
 #define STEPS_PER_REVOLUTION 4096
 
-#define MOVE_SPEED MAX_SPEED
+#define MOVE_SPEED 500
 
 /**
  * The pin mappings are for an Arduino Nano 
@@ -105,7 +105,9 @@ void update_all_positions_blocking() {
  * Each unit is initialized to the 'blank' position.
  * Run calibration to move each unit to the exact position.
  */
-SplitFlapUnit::SplitFlapUnit(uint8_t num_) : num_{num_}, current_pos_{10}, next_pos_{10} {};
+SplitFlapUnit::SplitFlapUnit(uint8_t num_) :
+    num_{num_}, current_pos_{10}, next_pos_{10},
+    current_lookup_idx_{10},next_lookup_idx_{10} {};
 
 /** Get Position
  * @return uint8_t current position (0 - 10)
@@ -130,6 +132,7 @@ void SplitFlapUnit::setPos(uint8_t pos) {
         // for the hour 'hands,' the flap order is flipped
         next_lookup_idx_ = (num_ <= HOUR_ONES) ? (9 - pos) : pos;
     }
+    dbprint("New position: ", pos, " LU index: ", next_lookup_idx_, "\n");
 }
 
 /** Set Steps
@@ -144,12 +147,16 @@ bool SplitFlapUnit::setSteps() {
         return false;
     }
 
-    int32_t steps_to_go = steps_lookup[next_lookup_idx_] - steps_lookup[current_lookup_idx_];
+    int32_t steps_to_go = 
+        (int32_t)(steps_lookup[next_lookup_idx_]) - (int32_t)(steps_lookup[current_lookup_idx_]);
     if (steps_to_go < 0) steps_to_go += STEPS_PER_REVOLUTION;
     if ((num_ % 2) == 0) steps_to_go *= -1;
     dbprint("Steps for next move: Unit #", num_, " Steps ", steps_to_go, "\n");
 
     this->trimSteps(steps_to_go);
+
+    current_pos_ = next_pos_;
+    current_lookup_idx_ = next_lookup_idx_;
 }
 
 /** Trim Steps
